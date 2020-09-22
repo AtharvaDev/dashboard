@@ -1,0 +1,59 @@
+import React, { Component } from "react";
+import Header from "./components/header/Header";
+import "./App.css";
+import firebase from "./firebase";
+import OrderTable from "./components/table1/OrderTable";
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      totalOrders: [],
+      topFiveOrder: [],
+    };
+  }
+
+  componentDidMount() {
+    const totalOrdersRef = firebase.database().ref("orders");
+    totalOrdersRef.on("value", (snap) => {
+      this.setState({totalOrders: snap.val()});
+      let totalOrders = snap.val();
+      // let newState = [];
+
+      // for (var i = 0; i < totalOrders.length; i++) {
+      //   newState.push({
+      //     orderNum: totalOrders[i].orderNum,
+      //     userName: totalOrders[i].userName,
+      //     createdDate: totalOrders[i].createdDate,
+      //     status: totalOrders[i].status,
+      //     amount: totalOrders[i].amount,
+      //     quantity: totalOrders[i].quantity,
+      //     region: totalOrders[i].region,
+      //   });
+      // }
+
+      let topFiveOrder = [...totalOrders];
+      topFiveOrder = topFiveOrder.sort((a, b) => {
+        return  b.ordernum - a.ordernum  ;
+      });
+
+      this.setState({topFiveOrder: topFiveOrder});
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        {/* {console.log("initial table")} */}
+        {/* {console.table(this.state.totalOrders)}  */}
+        {/* {console.log("ok next")} */}
+        {/* {console.table(this.state.totalOrders)} */}
+        <Header />
+        <OrderTable data={this.state.topFiveOrder} />
+      </div>
+    );
+  }
+}
+
+export default App;
